@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توازن برو | متتبع العادات والتغذية المبهج</title>
+    <!-- خطوط عربية عصرية -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- أيقونات Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- مكتبة Chart.js للرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'Cairo', 'sans-serif'],
+                        heading: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        creamBg: '#FFFDF8',
+                        softSand: '#F8F6F0',
+                        coral: {
+                            50: '#FFF4F1',
+                            100: '#FFE4DC',
+                            500: '#FF6B4A',
+                            600: '#E85332',
+                        },
+                        mint: {
+                            50: '#ECFDF5',
+                            100: '#D1FAE5',
+                            500: '#10B981',
+                            600: '#059669',
+                        },
+                        skyJoy: {
+                            50: '#F0F9FF',
+                            100: '#E0F2FE',
+                            500: '#0EA5E9',
+                            600: '#0284C7',
+                        },
+                        lavender: {
+                            50: '#F5F3FF',
+                            100: '#EDE9FE',
+                            500: '#8B5CF6',
+                            600: '#7C3AED',
+                        },
+                        sunny: {
+                            50: '#FFFBEB',
+                            100: '#FEF3C7',
+                            500: '#F59E0B',
+                            600: '#D97706',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 30px -10px rgba(249, 115, 22, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04)',
+                        'card': '0 8px 24px -6px rgba(15, 23, 42, 0.05)',
+                        'pill': '0 12px 32px -8px rgba(14, 165, 233, 0.14)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFFDF8;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 107, 74, 0.07) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 55%);
+            background-attachment: fixed;
+        }
+
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #FFFDF8; }
+        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .ring-progress {
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop {
+            animation: popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes bounceCheck {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+        .check-pop {
+            animation: bounceCheck 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-slate-800 font-sans antialiased selection:bg-coral-500 selection:text-white min-h-screen pb-24 md:pb-12">
+
+    <!-- ==================== شريط التنقل العلوي العائم (Top Floating Pill Header) ==================== -->
+    <header class="sticky top-0 z-40 pt-3 px-4 sm:px-6">
+        <div class="max-w-6xl mx-auto glass-header border border-white/80 shadow-soft rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+            
+            <!-- الشعار -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('today')">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-coral-500 via-sunny-500 to-mint-500 flex items-center justify-center text-white shadow-md shadow-coral-500/20">
+                    <i data-lucide="sun" class="w-5 h-5 stroke-[2.5]"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading text-lg sm:text-xl font-black tracking-tight text-slate-900 leading-none">توازن برو</h1>
+                    <span class="text-[11px] font-bold text-coral-500 hidden sm:inline-block">صحتك بطاقة إيجابية ✨</span>
+                </div>
+            </div>
+
+            <!-- قائمة التنقل الوسطى (Desktop Pill Navigation) -->
+            <nav class="hidden md:flex items-center bg-slate-100/90 p-1.5 rounded-full border border-slate-200/60">
+                <button onclick="switchTab('today')" data-tab="today" class="top-nav-btn flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold transition-all bg-white text-coral-600 shadow-sm">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>لوحة اليوم</span>
+                </button>
+                <button onclick="switchTab('nutrition')" data-tab="nutrition" class="top-nav-btn flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-slate-600 hover:text-slate-900 transition-all">
+                    <i data-lucide="utensils" class="w-4 h-4"></i>
+                    <span>سجل التغذية</span>
+                </button>
+                <button onclick="switchTab('habits')" data-tab="habits" class="top-nav-btn flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-slate-600 hover:text-slate-900 transition-all">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    <span>العادات الأسبوعية</span>
+                </button>
+                <button onclick="switchTab('analytics')" data-tab="analytics" class="top-nav-btn flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-slate-600 hover:text-slate-900 transition-all">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                    <span>التحليلات والأهداف</span>
+                </button>
+            </nav>
+
+            <!-- أزرار الإجراءات السريعة -->
+            <div class="flex items-center gap-2">
+                <button onclick="openGoalsModal()" class="p-2.5 rounded-full bg-slate-100 hover:bg-lavender-100 text-slate-600 hover:text-lavender-600 transition-colors" title="تعديل الأهداف اليومية">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                </button>
+                <button onclick="openMealModal()" class="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gradient-to-l from-coral-500 to-sunny-500 hover:opacity-95 text-white text-xs sm:text-sm font-extrabold shadow-md shadow-coral-500/25 transition-all">
+                    <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+                    <span>إضافة وجبة</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== المحتوى الرئيسي ==================== -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
+
+        <!-- بانر الترحيب المبهج وملخص السلسلة اليومية -->
+        <section class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-coral-500 via-orange-400 to-amber-400 p-6 sm:p-8 text-white shadow-soft">
+            <!-- دوائر زخرفية ناعمة -->
+            <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-white/15 blur-xl pointer-events-none"></div>
+            <div class="absolute -bottom-16 right-1/4 w-56 h-56 rounded-full bg-yellow-200/20 blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold mb-3">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                        <span id="current-date-text">جاري تحميل التاريخ...</span>
+                    </div>
+                    <h2 id="greeting-title" class="font-heading text-2xl sm:text-3xl font-black mb-1.5">صباح النشاط والتوازن! ☀️</h2>
+                    <p class="text-white/90 text-sm sm:text-base max-w-xl">تابع سعراتك، حافظ على توازن الصوديوم والبوتاسيوم، وحقق أهدافك اليومية خطوة بخطوة.</p>
+                </div>
+
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
+                    <div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl px-4 py-3 text-center min-w-[110px]">
+                        <span class="text-xs font-bold text-white/90 block">سلسلة الالتزام</span>
+                        <span id="hero-streak-val" class="font-heading text-2xl font-black">🔥 7 أيام</span>
+                    </div>
+                    <button onclick="openHabitModal()" class="bg-white text-coral-600 hover:bg-coral-50 font-extrabold text-xs sm:text-sm px-5 py-3.5 rounded-2xl shadow-md transition-all flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>عادة جديدة</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== التبويب 1: لوحة اليوم (Today's Joyful Overview) ==================== -->
+        <section id="tab-today" class="tab-content space-y-6 animate-pop">
+            
+            <!-- 4 بطاقات ملونة للمؤشرات الرئيسية -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                
+                <!-- 1. السعرات الحرارية -->
+                <div class="bg-white rounded-3xl p-5 border border-coral-100 shadow-card hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-coral-600 bg-coral-50 px-3 py-1 rounded-full">
+                            <i data-lucide="flame" class="w-3.5 h-3.5"></i> السعرات
+                        </span>
+                        <span id="cal-pct-badge" class="text-xs font-bold text-slate-400">0%</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 my-1">
+                        <span id="stat-cal-now" class="font-heading text-3xl font-black text-slate-900">0</span>
+                        <span id="stat-cal-target" class="text-xs font-bold text-slate-400">/ 2200 kcal</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-coral-50 rounded-full overflow-hidden mt-3">
+                        <div id="bar-cal" class="h-full bg-gradient-to-l from-coral-500 to-sunny-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="stat-cal-rem" class="text-xs font-bold text-coral-600 mt-2.5">متبقي 2200 سعرة</p>
+                </div>
+
+                <!-- 2. البروتين -->
+                <div class="bg-white rounded-3xl p-5 border border-lavender-100 shadow-card hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-lavender-600 bg-lavender-50 px-3 py-1 rounded-full">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i> البروتين
+                        </span>
+                        <span id="pro-pct-badge" class="text-xs font-bold text-slate-400">0%</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 my-1">
+                        <span id="stat-pro-now" class="font-heading text-3xl font-black text-slate-900">0g</span>
+                        <span id="stat-pro-target" class="text-xs font-bold text-slate-400">/ 150g</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-lavender-50 rounded-full overflow-hidden mt-3">
+                        <div id="bar-pro" class="h-full bg-gradient-to-l from-lavender-500 to-indigo-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="stat-macros-line" class="text-xs font-medium text-slate-500 mt-2.5">كارب 0g • دهون 0g</p>
+                </div>
+
+                <!-- 3. الصوديوم (Sodium mg) -->
+                <div class="bg-white rounded-3xl p-5 border border-sunny-100 shadow-card hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-sunny-600 bg-sunny-50 px-3 py-1 rounded-full">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> الصوديوم
+                        </span>
+                        <span id="sod-pct-badge" class="text-xs font-bold text-slate-400">0%</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 my-1">
+                        <span id="stat-sod-now" class="font-heading text-3xl font-black text-slate-900">0</span>
+                        <span id="stat-sod-target" class="text-xs font-bold text-slate-400">/ 2000 mg</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-sunny-50 rounded-full overflow-hidden mt-3">
+                        <div id="bar-sod" class="h-full bg-gradient-to-l from-amber-500 to-yellow-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="stat-sod-note" class="text-xs font-bold text-mint-600 mt-2.5">ضمن الحد الآمن ✓</p>
+                </div>
+
+                <!-- 4. البوتاسيوم (Potassium mg) -->
+                <div class="bg-white rounded-3xl p-5 border border-mint-100 shadow-card hover:-translate-y-1 transition-all">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-mint-600 bg-mint-50 px-3 py-1 rounded-full">
+                            <i data-lucide="zap" class="w-3.5 h-3.5"></i> البوتاسيوم
+                        </span>
+                        <span id="pot-pct-badge" class="text-xs font-bold text-slate-400">0%</span>
+                    </div>
+                    <div class="flex items-baseline gap-1.5 my-1">
+                        <span id="stat-pot-now" class="font-heading text-3xl font-black text-slate-900">0</span>
+                        <span id="stat-pot-target" class="text-xs font-bold text-slate-400">/ 3500 mg</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-mint-50 rounded-full overflow-hidden mt-3">
+                        <div id="bar-pot" class="h-full bg-gradient-to-l from-mint-500 to-teal-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p id="stat-pot-note" class="text-xs font-bold text-mint-600 mt-2.5">يدعم توازن السوائل</p>
+                </div>
+            </div>
+
+            <!-- صف مقياس توازن Na : K + متتبع المياه المبهج -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- مقياس توازن الصوديوم والبوتاسيوم -->
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-100 shadow-card flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="font-heading text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                                <span class="w-8 h-8 rounded-xl bg-skyJoy-100 text-skyJoy-600 flex items-center justify-center">
+                                    <i data-lucide="scale" class="w-4 h-4"></i>
+                                </span>
+                                <span>مقياس توازن الصوديوم والبوتاسيوم (Na : K)</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-1">تفوّق البوتاسيوم على الصوديوم يمنع احتباس السوائل ويمنحك نشاطاً وحيوية طوال اليوم</p>
+                        </div>
+                        <span id="nak-status-pill" class="self-start sm:self-center text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-mint-100 text-mint-600">
+                            توازن رائع 🌟
+                        </span>
+                    </div>
+
+                    <div class="my-4 bg-softSand p-4 rounded-2xl border border-slate-200/60">
+                        <div class="flex justify-between text-xs font-extrabold mb-2">
+                            <span class="text-sunny-600">🧂 صوديوم: <span id="nak-sod-val">0 mg</span> (<span id="nak-sod-pct">50%</span>)</span>
+                            <span class="text-mint-600">🍌 بوتاسيوم: <span id="nak-pot-val">0 mg</span> (<span id="nak-pot-pct">50%</span>)</span>
+                        </div>
+                        <div class="w-full h-5 bg-white rounded-full overflow-hidden flex p-1 shadow-inner border border-slate-200/70">
+                            <div id="nak-sod-bar" class="h-full bg-gradient-to-l from-amber-400 to-orange-400 rounded-r-full transition-all duration-500" style="width: 35%"></div>
+                            <div id="nak-pot-bar" class="h-full bg-gradient-to-l from-emerald-400 to-teal-500 rounded-l-full transition-all duration-500" style="width: 65%"></div>
+                        </div>
+                    </div>
+
+                    <div id="nak-tip-box" class="bg-skyJoy-50/80 border border-skyJoy-100 rounded-2xl p-3.5 text-xs text-skyJoy-900 flex items-center gap-3">
+                        <span class="text-lg">💡</span>
+                        <p id="nak-tip-text" class="font-medium">ممتاز! نسبة البوتاسيوم لديك أعلى من الصوديوم، مما يدعم صحة القلب وتوازن السوائل.</p>
+                    </div>
+                </div>
+
+                <!-- بطاقة متتبع المياه -->
+                <div class="bg-gradient-to-b from-skyJoy-50 to-white rounded-3xl p-6 border border-skyJoy-100 shadow-card flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-heading text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                                <span class="text-xl">💧</span>
+                                <span>ترطيب الجسم</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">الهدف: <span id="water-target-l" class="font-bold text-skyJoy-600">3.0</span> لتر يومياً</p>
+                        </div>
+                        <span id="water-pct-text" class="text-sm font-black text-skyJoy-600 bg-white px-3 py-1 rounded-full shadow-sm">0%</span>
+                    </div>
+
+                    <div class="my-5 flex items-center justify-center gap-4">
+                        <div class="relative w-20 h-20 flex items-center justify-center">
+                            <svg class="w-full h-full" viewBox="0 0 80 80">
+                                <circle class="text-skyJoy-100" stroke-width="8" stroke="currentColor" fill="transparent" r="32" cx="40" cy="40"/>
+                                <circle id="water-ring" class="text-skyJoy-500 ring-progress" stroke-width="8" stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" stroke="currentColor" fill="transparent" r="32" cx="40" cy="40"/>
+                            </svg>
+                            <i data-lucide="droplets" class="w-6 h-6 text-skyJoy-500 absolute"></i>
+                        </div>
+                        <div>
+                            <div class="font-heading text-3xl font-black text-slate-900">
+                                <span id="water-now-l">0.00</span> <span class="text-sm font-bold text-slate-500">لتر</span>
+                            </div>
+                            <span id="water-cups-count" class="text-xs font-bold text-skyJoy-600">0 أكواب (250 مل)</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button onclick="changeWater(250)" class="py-2.5 rounded-xl bg-skyJoy-500 hover:bg-skyJoy-600 text-white text-xs font-extrabold shadow-sm transition-all">+250</button>
+                        <button onclick="changeWater(500)" class="py-2.5 rounded-xl bg-skyJoy-500 hover:bg-skyJoy-600 text-white text-xs font-extrabold shadow-sm transition-all">+500</button>
+                        <button onclick="changeWater(750)" class="py-2.5 rounded-xl bg-skyJoy-100 hover:bg-skyJoy-200 text-skyJoy-700 text-xs font-extrabold transition-all">+750</button>
+                        <button onclick="changeWater(-250)" class="py-2.5 rounded-xl bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-500 border border-slate-200 text-xs font-bold transition-all" title="إنقاص كوب">-250</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صف عادات اليوم التفاعلية + أحدث الوجبات -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- عادات اليوم -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-heading text-lg font-extrabold text-slate-900">عاداتك اليومية ✨</h3>
+                            <p class="text-xs text-slate-500">اضغط على العادة لإتمامها ورفع سلسلة الالتزام</p>
+                        </div>
+                        <span id="today-habits-counter" class="text-xs font-extrabold bg-mint-50 text-mint-600 px-3 py-1 rounded-full">0 / 0</span>
+                    </div>
+                    <div id="today-habits-container" class="space-y-2.5"></div>
+                </div>
+
+                <!-- وجبات اليوم -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-heading text-lg font-extrabold text-slate-900">وجبات اليوم المسجلة 🥗</h3>
+                            <p class="text-xs text-slate-500">ملخص سريع لأحدث الأطعمة التي تناولتها</p>
+                        </div>
+                        <button onclick="switchTab('nutrition')" class="text-xs font-extrabold text-coral-600 hover:underline">عرض السجل الكامل ←</button>
+                    </div>
+                    <div id="today-meals-preview" class="space-y-2.5"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==================== التبويب 2: سجل التغذية والأطعمة (Nutrition Log) ==================== -->
+        <section id="tab-nutrition" class="tab-content hidden space-y-6 animate-pop">
+            
+            <!-- شريط الفلاتر والأزرار -->
+            <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <!-- أزرار فلترة نوع الوجبة -->
+                <div class="flex flex-wrap items-center gap-2" id="meal-filter-pills">
+                    <button onclick="filterMealsByType('الكل')" data-meal-filter="الكل" class="meal-pill px-4 py-2 rounded-full text-xs font-extrabold bg-coral-500 text-white shadow-sm transition-all">الكل</button>
+                    <button onclick="filterMealsByType('الإفطار')" data-meal-filter="الإفطار" class="meal-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">🌅 الإفطار</button>
+                    <button onclick="filterMealsByType('الغداء')" data-meal-filter="الغداء" class="meal-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">☀️ الغداء</button>
+                    <button onclick="filterMealsByType('العشاء')" data-meal-filter="العشاء" class="meal-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">🌙 العشاء</button>
+                    <button onclick="filterMealsByType('سناك')" data-meal-filter="سناك" class="meal-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">🍎 سناك</button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openCustomFoodModal()" class="px-4 py-2.5 rounded-full bg-lavender-50 hover:bg-lavender-100 text-lavender-600 text-xs font-extrabold flex items-center gap-1.5 transition-all">
+                        <i data-lucide="database" class="w-4 h-4"></i>
+                        <span>+ صنف جديد للقاعدة</span>
+                    </button>
+                    <button onclick="openMealModal()" class="px-4 py-2.5 rounded-full bg-mint-500 hover:bg-mint-600 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 transition-all">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>تسجيل وجبة</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- قائمة الوجبات المسجلة -->
+            <div id="nutrition-meals-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- يتم توليدها بواسطة JS -->
+            </div>
+        </section>
+
+        <!-- ==================== التبويب 3: متتبع العادات الأسبوعي (Weekly Habit Tracker) ==================== -->
+        <section id="tab-habits" class="tab-content hidden space-y-6 animate-pop">
+            
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-card">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="font-heading text-xl font-black text-slate-900">مصفوفة الالتزام الأسبوعي 🗓️</h3>
+                        <p class="text-xs text-slate-500 mt-1">تابع التزامك على مدار أيام الأسبوع وحافظ على استمرارية سلسلتك</p>
+                    </div>
+                    <button onclick="openHabitModal()" class="self-start sm:self-center px-5 py-2.5 rounded-full bg-gradient-to-l from-mint-500 to-teal-500 text-white text-xs font-extrabold shadow-md shadow-mint-500/20 flex items-center gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>إضافة عادة جديدة</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse min-w-[680px]">
+                        <thead>
+                            <tr class="bg-softSand text-slate-600 text-xs font-extrabold">
+                                <th class="py-3.5 px-4 rounded-r-2xl">العادة والتصنيف</th>
+                                <th class="py-3.5 px-2 text-center">السبت</th>
+                                <th class="py-3.5 px-2 text-center">الأحد</th>
+                                <th class="py-3.5 px-2 text-center">الإثنين</th>
+                                <th class="py-3.5 px-2 text-center">الثلاثاء</th>
+                                <th class="py-3.5 px-2 text-center">الأربعاء</th>
+                                <th class="py-3.5 px-2 text-center">الخميس</th>
+                                <th class="py-3.5 px-2 text-center text-coral-600">اليوم</th>
+                                <th class="py-3.5 px-3 text-center">الإنجاز</th>
+                                <th class="py-3.5 px-3 text-center rounded-l-2xl">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="habits-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- يتم تعبئتها بواسطة JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== التبويب 4: التحليلات والأهداف (Analytics & Goals) ==================== -->
+        <section id="tab-analytics" class="tab-content hidden space-y-6 animate-pop">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- رسم بياني للسعرات الحرارية -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-card">
+                    <h3 class="font-heading text-lg font-extrabold text-slate-900 mb-1">مؤشر السعرات الحرارية (آخر 7 أيام)</h3>
+                    <p class="text-xs text-slate-500 mb-4">متابعة استهلاكك اليومي من الطاقة خلال الأسبوع</p>
+                    <div class="h-64">
+                        <canvas id="caloriesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- رسم بياني لمقارنة الصوديوم والبوتاسيوم -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-card">
+                    <h3 class="font-heading text-lg font-extrabold text-slate-900 mb-1">توازن الصوديوم مقابل البوتاسيوم (mg)</h3>
+                    <p class="text-xs text-slate-500 mb-4">مقارنة أسبوعية بين مستويات الصوديوم والبوتاسيوم</p>
+                    <div class="h-64">
+                        <canvas id="electrolytesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة النسخ الاحتياطي وإعادة الضبط -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-heading text-base font-extrabold text-slate-900">النسخ الاحتياطي وإدارة البيانات</h3>
+                    <p class="text-xs text-slate-500 mt-1">بياناتك محفوظة تلقائياً في متصفحك. يمكنك تصدير نسخة JSON أو استعادة البيانات التجريبية.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <button onclick="exportBackup()" class="px-4 py-2.5 rounded-full bg-skyJoy-50 hover:bg-skyJoy-100 text-skyJoy-700 text-xs font-extrabold flex items-center gap-2 transition-all">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>تصدير نسخة احتياطية</span>
+                    </button>
+                    <button onclick="resetDemoState()" class="px-4 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-extrabold flex items-center gap-2 transition-all">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span>استعادة البيانات التجريبية</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== شريط التنقل السفلي العائم للموبايل ==================== -->
+    <nav class="md:hidden fixed bottom-3 inset-x-4 z-40 glass-header border border-slate-200/80 shadow-pill rounded-full px-3 py-2 flex justify-around items-center">
+        <button onclick="switchTab('today')" data-tab="today" class="mobile-nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-full text-coral-600">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <span class="text-[10px] font-extrabold">اليوم</span>
+        </button>
+        <button onclick="switchTab('nutrition')" data-tab="nutrition" class="mobile-nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-full text-slate-500">
+            <i data-lucide="utensils" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">التغذية</span>
+        </button>
+        <button onclick="switchTab('habits')" data-tab="habits" class="mobile-nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-full text-slate-500">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">العادات</span>
+        </button>
+        <button onclick="switchTab('analytics')" data-tab="analytics" class="mobile-nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-full text-slate-500">
+            <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">التحليلات</span>
+        </button>
+    </nav>
+
+    <!-- ==================== نافذة تسجيل وجبة جديدة (Meal Modal) ==================== -->
+    <div id="meal-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border border-slate-100 animate-pop">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <h3 class="font-heading text-lg font-black text-slate-900">إضافة وجبة إلى سجل اليوم 🥗</h3>
+                <button onclick="closeModal('meal-modal')" class="p-2 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddMeal(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 mb-1.5">تصنيف الوجبة</label>
+                        <select id="meal-type-input" class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-coral-500">
+                            <option value="الإفطار">🌅 الإفطار</option>
+                            <option value="الغداء">☀️ الغداء</option>
+                            <option value="العشاء">🌙 العشاء</option>
+                            <option value="سناك">🍎 سناك / مشروب</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 mb-1.5">الوزن بالجرام (g)</label>
+                        <input type="number" id="meal-grams-input" oninput="updateLiveMacroPreview()" min="1" max="2000" value="100" required class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-coral-500">
+                    </div>
+                </div>
+
+                <!-- أزرار أوزان سريعة -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500 font-bold">كميات سريعة:</span>
+                    <button type="button" onclick="setGramsPreset(50)" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-coral-100 text-slate-700 hover:text-coral-600 text-xs font-bold">50g</button>
+                    <button type="button" onclick="setGramsPreset(100)" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-coral-100 text-slate-700 hover:text-coral-600 text-xs font-bold">100g</button>
+                    <button type="button" onclick="setGramsPreset(150)" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-coral-100 text-slate-700 hover:text-coral-600 text-xs font-bold">150g</button>
+                    <button type="button" onclick="setGramsPreset(200)" class="px-3 py-1 rounded-full bg-slate-100 hover:bg-coral-100 text-slate-700 hover:text-coral-600 text-xs font-bold">200g</button>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1.5">اختر الصنف الغذائي</label>
+                    <select id="meal-food-select" onchange="updateLiveMacroPreview()" class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-coral-500">
+                        <!-- يتم تعبئتها من قاعدة الأطعمة -->
+                    </select>
+                </div>
+
+                <!-- بطاقة معاينة القيم الغذائية الفورية -->
+                <div class="bg-gradient-to-l from-coral-50/70 via-sunny-50/70 to-mint-50/70 border border-slate-200/70 rounded-2xl p-4">
+                    <span class="text-xs font-bold text-slate-600 block mb-2.5">القيم الغذائية المحسوبة للكمية:</span>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <span class="text-[10px] text-slate-400 block font-bold">سعرات</span>
+                            <strong id="prev-cal" class="text-xs font-black text-coral-600">0</strong>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <span class="text-[10px] text-slate-400 block font-bold">بروتين</span>
+                            <strong id="prev-pro" class="text-xs font-black text-lavender-600">0g</strong>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <span class="text-[10px] text-slate-400 block font-bold">كارب</span>
+                            <strong id="prev-carb" class="text-xs font-black text-slate-700">0g</strong>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <span class="text-[10px] text-slate-400 block font-bold">دهون</span>
+                            <strong id="prev-fat" class="text-xs font-black text-slate-700">0g</strong>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <span class="text-[10px] text-slate-400 block font-bold">صوديوم</span>
+                            <strong id="prev-sod" class="text-xs font-black text-sunny-600">0mg</strong>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">
+                            <span class="text-[10px] text-slate-400 block font-bold">بوتاسيوم</span>
+                            <strong id="prev-pot" class="text-xs font-black text-mint-600">0mg</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('meal-modal')" class="px-5 py-2.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">إلغاء</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full bg-coral-500 hover:bg-coral-600 text-white text-xs font-extrabold shadow-md shadow-coral-500/25">إضافة للسجل</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة إضافة صنف مخصص لقاعدة البيانات ==================== -->
+    <div id="custom-food-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl border border-slate-100 animate-pop">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <h3 class="font-heading text-lg font-black text-slate-900">إضافة صنف جديد (لكل 100 جرام)</h3>
+                <button onclick="closeModal('custom-food-modal')" class="p-2 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddCustomFood(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1.5">اسم الصنف الغذائي *</label>
+                    <input type="text" id="cf-name" required placeholder="مثال: بطاطا حلوة مشوية" class="w-full bg-softSand border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-lavender-500">
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">السعرات (kcal)</label>
+                        <input type="number" step="0.1" id="cf-cal" required value="90" class="w-full bg-softSand border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">البروتين (g)</label>
+                        <input type="number" step="0.1" id="cf-pro" required value="2" class="w-full bg-softSand border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">الكارب (g)</label>
+                        <input type="number" step="0.1" id="cf-carb" required value="21" class="w-full bg-softSand border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">الدهون (g)</label>
+                        <input type="number" step="0.1" id="cf-fat" required value="0.2" class="w-full bg-softSand border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sunny-600 mb-1">الصوديوم (mg)</label>
+                        <input type="number" step="1" id="cf-sod" required value="36" class="w-full bg-softSand border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-mint-600 mb-1">البوتاسيوم (mg)</label>
+                        <input type="number" step="1" id="cf-pot" required value="475" class="w-full bg-softSand border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('custom-food-modal')" class="px-5 py-2.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">إلغاء</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full bg-lavender-600 text-white text-xs font-extrabold shadow-md">حفظ الصنف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة إضافة عادة جديدة (Habit Modal) ==================== -->
+    <div id="habit-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl border border-slate-100 animate-pop">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <h3 class="font-heading text-lg font-black text-slate-900">إضافة عادة يومية جديدة ✨</h3>
+                <button onclick="closeModal('habit-modal')" class="p-2 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddHabit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1.5">اسم العادة *</label>
+                    <input type="text" id="habit-title-input" required placeholder="مثال: المشي 8000 خطوة أو تناول ثمرة فاكهة" class="w-full bg-softSand border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-mint-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 mb-1.5">التصنيف</label>
+                        <select id="habit-cat-input" class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-slate-800">
+                            <option value="صحة">صحة</option>
+                            <option value="تغذية">تغذية</option>
+                            <option value="رياضة">رياضة</option>
+                            <option value="تركيز">تركيز</option>
+                            <option value="نوم">نوم</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 mb-1.5">الأيقونة</label>
+                        <select id="habit-emoji-input" class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-slate-800">
+                            <option value="🌟">🌟 نجمة</option>
+                            <option value="💧">💧 ماء</option>
+                            <option value="🥗">🥗 غذاء صحي</option>
+                            <option value="🏃">🏃 حركة</option>
+                            <option value="😴">😴 نوم</option>
+                            <option value="🧠">🧠 تركيز</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('habit-modal')" class="px-5 py-2.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">إلغاء</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full bg-mint-500 hover:bg-mint-600 text-white text-xs font-extrabold shadow-md">إضافة العادة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== نافذة تخصيص الأهداف اليومية (Goals Modal) ==================== -->
+    <div id="goals-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl border border-slate-100 animate-pop">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <h3 class="font-heading text-lg font-black text-slate-900">تعديل الأهداف اليومية 🎯</h3>
+                <button onclick="closeModal('goals-modal')" class="p-2 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSaveGoals(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">هدف السعرات الحرارية (kcal)</label>
+                    <input type="number" id="g-cal" required min="1000" max="6000" class="w-full bg-softSand border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-extrabold text-slate-700 mb-1">هدف البروتين اليومي (جرام)</label>
+                    <input type="number" id="g-pro" required min="30" max="400" class="w-full bg-softSand border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-extrabold text-sunny-600 mb-1">الحد الأقصى للصوديوم (mg)</label>
+                        <input type="number" id="g-sod" required min="500" max="5000" class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-extrabold text-mint-600 mb-1">هدف البوتاسيوم (mg)</label>
+                        <input type="number" id="g-pot" required min="1000" max="7000" class="w-full bg-softSand border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-extrabold text-skyJoy-600 mb-1">هدف شرب المياه اليومي (ملليلتر - ml)</label>
+                    <input type="number" id="g-water" required min="1000" max="8000" step="250" class="w-full bg-softSand border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold">
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('goals-modal')" class="px-5 py-2.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">إلغاء</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-full bg-coral-500 text-white text-xs font-extrabold shadow-md">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- حاوية التنبيهات العائمة -->
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 left-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- ==================== كود JavaScript المتكامل ==================== -->
+    <script>
+        const STORAGE_KEY = 'tawazun_pro_bright_v2';
+
+        // قاعدة بيانات أطعمة مصرية وصحية شاملة (القيم لكل 100 جرام)
+        const FOOD_DATABASE = [
+            { id: 'f1', name: 'صدور دجاج مشوية (بدون جلد)', cal: 165, pro: 31, carb: 0, fat: 3.6, sod: 74, pot: 256 },
+            { id: 'f2', name: 'عيش بلدي مصري أسمر', cal: 245, pro: 8.5, carb: 50, fat: 1.2, sod: 420, pot: 185 },
+            { id: 'f3', name: 'بطاطس مسلوقة (بدون ملح)', cal: 87, pro: 1.9, carb: 20, fat: 0.1, sod: 5, pot: 379 },
+            { id: 'f4', name: 'بيض مسلوق كامل', cal: 155, pro: 13, carb: 1.1, fat: 11, sod: 124, pot: 126 },
+            { id: 'f5', name: 'موز طازج', cal: 89, pro: 1.1, carb: 23, fat: 0.3, sod: 1, pot: 358 },
+            { id: 'f6', name: 'شوفان كامل الحبة (جاف)', cal: 379, pro: 13.2, carb: 67.7, fat: 6.5, sod: 6, pot: 362 },
+            { id: 'f7', name: 'زبادي يوناني طبيعي', cal: 97, pro: 9, carb: 3.6, fat: 5, sod: 36, pot: 141 },
+            { id: 'f8', name: 'أرز أبيض مطبوخ (بدون ملح)', cal: 130, pro: 2.7, carb: 28, fat: 0.3, sod: 1, pot: 35 },
+            { id: 'f9', name: 'تونة مصفاة بالماء', cal: 116, pro: 26, carb: 0, fat: 0.8, sod: 247, pot: 237 },
+            { id: 'f10', name: 'سبانخ مطبوخة / طازجة', cal: 23, pro: 2.9, carb: 3.6, fat: 0.4, sod: 79, pot: 558 },
+            { id: 'f11', name: 'أفوكادو طازج', cal: 160, pro: 2, carb: 8.5, fat: 15, sod: 7, pot: 485 },
+            { id: 'f12', name: 'جبنة قريش طازجة (قليلة الملح)', cal: 98, pro: 11, carb: 3.4, fat: 4.3, sod: 180, pot: 104 },
+            { id: 'f13', name: 'فول مدمس سادة (بدون زيت)', cal: 110, pro: 7.6, carb: 19.6, fat: 0.4, sod: 210, pot: 268 },
+            { id: 'f14', name: 'بطاطا حلوة مشوية', cal: 90, pro: 2, carb: 21, fat: 0.2, sod: 36, pot: 475 },
+            { id: 'f15', name: 'تمر مجفف (بلح)', cal: 277, pro: 1.8, carb: 75, fat: 0.2, sod: 1, pot: 696 },
+            { id: 'f16', name: 'حليب كامل الدسم', cal: 61, pro: 3.2, carb: 4.8, fat: 3.3, sod: 43, pot: 132 }
+        ];
+
+        const DEFAULT_STATE = {
+            goals: {
+                calories: 2200,
+                protein: 150,
+                sodium: 2000,
+                potassium: 3500,
+                water: 3000
+            },
+            waterMl: 1750,
+            foods: [...FOOD_DATABASE],
+            meals: [
+                { id: 'm1', type: 'الإفطار', foodId: 'f4', name: 'بيض مسلوق كامل', grams: 150, cal: 233, pro: 19.5, carb: 1.7, fat: 16.5, sod: 186, pot: 189 },
+                { id: 'm2', type: 'الإفطار', foodId: 'f2', name: 'عيش بلدي مصري أسمر', grams: 80, cal: 196, pro: 6.8, carb: 40, fat: 1, sod: 336, pot: 148 },
+                { id: 'm3', type: 'الغداء', foodId: 'f1', name: 'صدور دجاج مشوية (بدون جلد)', grams: 200, cal: 330, pro: 62, carb: 0, fat: 7.2, sod: 148, pot: 512 },
+                { id: 'm4', type: 'الغداء', foodId: 'f3', name: 'بطاطس مسلوقة (بدون ملح)', grams: 250, cal: 218, pro: 4.8, carb: 50, fat: 0.3, sod: 13, pot: 948 },
+                { id: 'm5', type: 'سناك', foodId: 'f5', name: 'موز طازج', grams: 120, cal: 107, pro: 1.3, carb: 27.6, fat: 0.4, sod: 1, pot: 430 }
+            ],
+            habits: [
+                { id: 'h1', emoji: '💧', title: 'شرب 3 لتر ماء على مدار اليوم', category: 'صحة', streak: 6, week: [true, true, true, true, true, true, false] },
+                { id: 'h2', emoji: '🥗', title: 'الحفاظ على الصوديوم أقل من 2000 mg', category: 'تغذية', streak: 5, week: [true, false, true, true, true, true, true] },
+                { id: 'h3', emoji: '🏃', title: 'المشي السريع أو التمرين 30 دقيقة', category: 'رياضة', streak: 4, week: [false, true, true, false, true, true, true] },
+                { id: 'h4', emoji: '🍌', title: 'تناول مصدر غني بالبوتاسيوم يومياً', category: 'تغذية', streak: 7, week: [true, true, true, true, true, true, true] },
+                { id: 'h5', emoji: '😴', title: 'النوم المبكر 7-8 ساعات متواصلة', category: 'نوم', streak: 3, week: [true, true, false, true, true, true, false] }
+            ]
+        };
+
+        let state = {};
+        let currentMealFilter = 'الكل';
+        let calChart = null;
+        let elecChart = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            updateGreetingAndDate();
+            populateFoodsSelect();
+            renderAll();
+            lucide.createIcons();
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    state = JSON.parse(saved);
+                } catch (e) {
+                    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                }
+            } else {
+                state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                saveState();
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function updateGreetingAndDate() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = 'يومك مليء بالطاقة والتوازن! ☀️';
+            if (hour < 12) greeting = 'صباح النشاط والتوازن! ☀️';
+            else if (hour < 18) greeting = 'طاب يومك بالصحة والحيوية! 🌤️';
+            else greeting = 'مساء الراحة والتوازن الصحي! ✨';
+
+            document.getElementById('greeting-title').textContent = greeting;
+            const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date-text').textContent = now.toLocaleDateString('ar-EG', opts);
+        }
+
+        // التنقل بين التبويبات
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            // تحديث أزرار الكمبيوتر
+            document.querySelectorAll('.top-nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.className = 'top-nav-btn flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold transition-all bg-white text-coral-600 shadow-sm';
+                } else {
+                    btn.className = 'top-nav-btn flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-slate-600 hover:text-slate-900 transition-all';
+                }
+            });
+
+            // تحديث أزرار الموبايل
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.remove('text-slate-500');
+                    btn.classList.add('text-coral-600');
+                } else {
+                    btn.classList.add('text-slate-500');
+                    btn.classList.remove('text-coral-600');
+                }
+            });
+
+            if (tabName === 'analytics') {
+                renderAnalyticsCharts();
+            }
+            lucide.createIcons();
+        }
+
+        function renderAll() {
+            const totals = getTotals();
+            renderTodayCards(totals);
+            renderTodayLists();
+            renderNutritionGrid();
+            renderHabitsTable();
+            lucide.createIcons();
+        }
+
+        function getTotals() {
+            return state.meals.reduce((acc, item) => {
+                acc.cal += Number(item.cal) || 0;
+                acc.pro += Number(item.pro) || 0;
+                acc.carb += Number(item.carb) || 0;
+                acc.fat += Number(item.fat) || 0;
+                acc.sod += Number(item.sod) || 0;
+                acc.pot += Number(item.pot) || 0;
+                return acc;
+            }, { cal: 0, pro: 0, carb: 0, fat: 0, sod: 0, pot: 0 });
+        }
+
+        // تحديث البطاقات العلوية ومقياس Na:K والمياه
+        function renderTodayCards(t) {
+            const g = state.goals;
+
+            // 1. السعرات
+            const calNow = Math.round(t.cal);
+            const calPct = Math.min(100, Math.round((calNow / g.calories) * 100));
+            document.getElementById('stat-cal-now').textContent = calNow;
+            document.getElementById('stat-cal-target').textContent = `/ ${g.calories} kcal`;
+            document.getElementById('cal-pct-badge').textContent = `${calPct}%`;
+            document.getElementById('bar-cal').style.width = `${calPct}%`;
+            const calDiff = g.calories - calNow;
+            document.getElementById('stat-cal-rem').textContent = calDiff >= 0 ? `متبقي ${calDiff} سعرة` : `تجاوزت الهدف بـ ${Math.abs(calDiff)} سعرة`;
+
+            // 2. البروتين
+            const proNow = Math.round(t.pro);
+            const proPct = Math.min(100, Math.round((proNow / g.protein) * 100));
+            document.getElementById('stat-pro-now').textContent = `${proNow}g`;
+            document.getElementById('stat-pro-target').textContent = `/ ${g.protein}g`;
+            document.getElementById('pro-pct-badge').textContent = `${proPct}%`;
+            document.getElementById('bar-pro').style.width = `${proPct}%`;
+            document.getElementById('stat-macros-line').textContent = `كارب ${Math.round(t.carb)}g • دهون ${Math.round(t.fat)}g`;
+
+            // 3. الصوديوم
+            const sodNow = Math.round(t.sod);
+            const sodPct = Math.min(100, Math.round((sodNow / g.sodium) * 100));
+            document.getElementById('stat-sod-now').textContent = sodNow;
+            document.getElementById('stat-sod-target').textContent = `/ ${g.sodium} mg`;
+            document.getElementById('sod-pct-badge').textContent = `${sodPct}%`;
+            document.getElementById('bar-sod').style.width = `${sodPct}%`;
+            const sodNote = document.getElementById('stat-sod-note');
+            if (sodNow > g.sodium) {
+                sodNote.textContent = '⚠️ تجاوزت الحد الأقصى!';
+                sodNote.className = 'text-xs font-extrabold text-rose-600 mt-2.5';
+            } else {
+                sodNote.textContent = 'ضمن الحد الآمن ✓';
+                sodNote.className = 'text-xs font-bold text-mint-600 mt-2.5';
+            }
+
+            // 4. البوتاسيوم
+            const potNow = Math.round(t.pot);
+            const potPct = Math.min(100, Math.round((potNow / g.potassium) * 100));
+            document.getElementById('stat-pot-now').textContent = potNow;
+            document.getElementById('stat-pot-target').textContent = `/ ${g.potassium} mg`;
+            document.getElementById('pot-pct-badge').textContent = `${potPct}%`;
+            document.getElementById('bar-pot').style.width = `${potPct}%`;
+            document.getElementById('stat-pot-note').textContent = potNow >= g.potassium ? '🎉 حققت هدف البوتاسيوم!' : `متبقي ${g.potassium - potNow} mg`;
+
+            // 5. مقياس توازن Na : K
+            const totalElec = sodNow + potNow;
+            const sodRatio = totalElec === 0 ? 50 : Math.round((sodNow / totalElec) * 100);
+            const potRatio = totalElec === 0 ? 50 : 100 - sodRatio;
+
+            document.getElementById('nak-sod-val').textContent = `${sodNow} mg`;
+            document.getElementById('nak-pot-val').textContent = `${potNow} mg`;
+            document.getElementById('nak-sod-pct').textContent = `${sodRatio}%`;
+            document.getElementById('nak-pot-pct').textContent = `${potRatio}%`;
+            document.getElementById('nak-sod-bar').style.width = `${sodRatio}%`;
+            document.getElementById('nak-pot-bar').style.width = `${potRatio}%`;
+
+            const pill = document.getElementById('nak-status-pill');
+            const tip = document.getElementById('nak-tip-text');
+            if (potNow >= sodNow && sodNow <= g.sodium) {
+                pill.textContent = 'توازن رائع 🌟';
+                pill.className = 'self-start sm:self-center text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-mint-100 text-mint-700';
+                tip.textContent = 'ممتاز! نسبة البوتاسيوم لديك أعلى من الصوديوم، مما يدعم صحة القلب وتوازن السوائل ويقلل الانتفاخ.';
+            } else {
+                pill.textContent = 'يحتاج موازنة ⚠️';
+                pill.className = 'self-start sm:self-center text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-sunny-100 text-sunny-700';
+                tip.textContent = 'نسبة الصوديوم مرتفعة مقارنة بالبوتاسيوم. أضف موزة أو بطاطس مسلوقة أو سبانخ لرفع البوتاسيوم واشرب كوب ماء.';
+            }
+
+            // 6. متتبع المياه
+            const wPct = Math.min(100, Math.round((state.waterMl / g.water) * 100));
+            document.getElementById('water-target-l').textContent = (g.water / 1000).toFixed(1);
+            document.getElementById('water-now-l').textContent = (state.waterMl / 1000).toFixed(2);
+            document.getElementById('water-pct-text').textContent = `${wPct}%`;
+            document.getElementById('water-cups-count').textContent = `${Math.floor(state.waterMl / 250)} أكواب (250 مل)`;
+
+            const circumference = 2 * Math.PI * 32; // ~201
+            const offset = circumference - (wPct / 100) * circumference;
+            document.getElementById('water-ring').style.strokeDashoffset = offset;
+
+            // أعلى سلسلة التزام في البانر
+            const maxStreak = state.habits.reduce((max, h) => Math.max(max, h.streak), 0);
+            document.getElementById('hero-streak-val').textContent = `🔥 ${maxStreak} أيام`;
+        }
+
+        function changeWater(ml) {
+            state.waterMl = Math.max(0, state.waterMl + ml);
+            saveState();
+            renderAll();
+            if (ml > 0) showToast(`عاش! تم إضافة +${ml} مل من الماء 💧`, 'mint');
+        }
+
+        // عرض قوائم لوحة اليوم
+        function renderTodayLists() {
+            const habitsBox = document.getElementById('today-habits-container');
+            const doneCount = state.habits.filter(h => h.week[6]).length;
+            document.getElementById('today-habits-counter').textContent = `${doneCount} / ${state.habits.length}`;
+
+            if (state.habits.length === 0) {
+                habitsBox.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">لا توجد عادات بعد. أضف عادتك الأولى الآن!</p>`;
+            } else {
+                habitsBox.innerHTML = state.habits.map(h => {
+                    const done = h.week[6];
+                    return `
+                        <div onclick="toggleHabit(${`'${h.id}'`}, 6)" class="cursor-pointer flex items-center justify-between p-3.5 rounded-2xl border transition-all ${done ? 'bg-mint-50/70 border-mint-200' : 'bg-softSand/70 border-slate-200/60 hover:border-coral-300'}">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-6 h-6 rounded-xl flex items-center justify-center shrink-0 transition-all ${done ? 'bg-mint-500 text-white check-pop' : 'bg-white border-2 border-slate-300'}">
+                                    ${done ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
+                                </div>
+                                <span class="text-base">${h.emoji || '✨'}</span>
+                                <span class="text-xs sm:text-sm font-bold ${done ? 'line-through text-slate-400' : 'text-slate-800'} truncate">${escapeHTML(h.title)}</span>
+                            </div>
+                            <span class="text-[11px] font-extrabold text-coral-600 bg-white px-2.5 py-1 rounded-full shadow-sm shrink-0 mr-2">🔥 ${h.streak}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const mealsBox = document.getElementById('today-meals-preview');
+            if (state.meals.length === 0) {
+                mealsBox.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">لم تسجل أي وجبات اليوم بعد.</p>`;
+            } else {
+                mealsBox.innerHTML = state.meals.slice(-5).reverse().map(m => `
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-softSand/70 border border-slate-200/60">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-white text-coral-600 shadow-sm">${m.type}</span>
+                                <span class="text-xs sm:text-sm font-extrabold text-slate-800 truncate">${escapeHTML(m.name)} (${m.grams}g)</span>
+                            </div>
+                            <p class="text-[11px] font-medium text-slate-500 mt-1">
+                                بروتين ${m.pro}g • <span class="text-sunny-600 font-bold">Na ${m.sod}mg</span> • <span class="text-mint-600 font-bold">K ${m.pot}mg</span>
+                            </p>
+                        </div>
+                        <span class="text-xs font-black text-coral-600 bg-coral-50 px-3 py-1 rounded-full shrink-0 mr-2">${m.cal} kcal</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==================== سجل التغذية والأطعمة ====================
+        function filterMealsByType(type) {
+            currentMealFilter = type;
+            document.querySelectorAll('.meal-pill').forEach(btn => {
+                if (btn.dataset.mealFilter === type) {
+                    btn.className = 'meal-pill px-4 py-2 rounded-full text-xs font-extrabold bg-coral-500 text-white shadow-sm transition-all';
+                } else {
+                    btn.className = 'meal-pill px-4 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all';
+                }
+            });
+            renderNutritionGrid();
+        }
+
+        function renderNutritionGrid() {
+            const grid = document.getElementById('nutrition-meals-grid');
+            const filtered = currentMealFilter === 'الكل' 
+                ? state.meals 
+                : state.meals.filter(m => m.type === currentMealFilter);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-3xl p-10 text-center border border-slate-100 shadow-card">
+                        <span class="text-4xl block mb-2">🍽️</span>
+                        <h4 class="font-heading text-base font-extrabold text-slate-800">لا توجد وجبات في هذا التصنيف</h4>
+                        <p class="text-xs text-slate-500 mt-1">اضغط على زر "تسجيل وجبة" لإضافة طعامك وحساب قيمه الغذائية.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(m => `
+                <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-card flex flex-col justify-between gap-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="inline-block text-[11px] font-extrabold px-3 py-0.5 rounded-full bg-coral-50 text-coral-600 mb-1.5">${m.type}</span>
+                            <h4 class="font-heading text-base font-extrabold text-slate-900">${escapeHTML(m.name)} <span class="text-xs font-bold text-slate-400">(${m.grams} جم)</span></h4>
+                        </div>
+                        <button onclick="removeMeal('${m.id}')" class="p-2 rounded-full bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors" title="حذف">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-5 gap-1.5 text-center bg-softSand p-2.5 rounded-2xl">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-bold">سعرات</span>
+                            <strong class="text-xs font-black text-coral-600">${m.cal}</strong>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-bold">بروتين</span>
+                            <strong class="text-xs font-black text-lavender-600">${m.pro}g</strong>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-bold">كارب</span>
+                            <strong class="text-xs font-black text-slate-700">${m.carb}g</strong>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-bold">صوديوم</span>
+                            <strong class="text-xs font-black text-sunny-600">${m.sod}mg</strong>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-bold">بوتاسيوم</span>
+                            <strong class="text-xs font-black text-mint-600">${m.pot}mg</strong>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function populateFoodsSelect() {
+            const select = document.getElementById('meal-food-select');
+            select.innerHTML = state.foods.map(f => 
+                `<option value="${f.id}">${escapeHTML(f.name)} (${f.cal} kcal / 100g)</option>`
+            ).join('');
+            updateLiveMacroPreview();
+        }
+
+        function setGramsPreset(g) {
+            document.getElementById('meal-grams-input').value = g;
+            updateLiveMacroPreview();
+        }
+
+        function updateLiveMacroPreview() {
+            const foodId = document.getElementById('meal-food-select').value;
+            const grams = parseFloat(document.getElementById('meal-grams-input').value) || 0;
+            const food = state.foods.find(f => f.id === foodId);
+            if (!food) return;
+
+            const ratio = grams / 100;
+            document.getElementById('prev-cal').textContent = Math.round(food.cal * ratio);
+            document.getElementById('prev-pro').textContent = (food.pro * ratio).toFixed(1) + 'g';
+            document.getElementById('prev-carb').textContent = (food.carb * ratio).toFixed(1) + 'g';
+            document.getElementById('prev-fat').textContent = (food.fat * ratio).toFixed(1) + 'g';
+            document.getElementById('prev-sod').textContent = Math.round(food.sod * ratio) + 'mg';
+            document.getElementById('prev-pot').textContent = Math.round(food.pot * ratio) + 'mg';
+        }
+
+        function handleAddMeal(e) {
+            e.preventDefault();
+            const type = document.getElementById('meal-type-input').value;
+            const foodId = document.getElementById('meal-food-select').value;
+            const grams = parseFloat(document.getElementById('meal-grams-input').value) || 100;
+            const food = state.foods.find(f => f.id === foodId);
+            if (!food) return;
+
+            const r = grams / 100;
+            state.meals.push({
+                id: 'm_' + Date.now(),
+                type,
+                foodId: food.id,
+                name: food.name,
+                grams,
+                cal: Math.round(food.cal * r),
+                pro: Number((food.pro * r).toFixed(1)),
+                carb: Number((food.carb * r).toFixed(1)),
+                fat: Number((food.fat * r).toFixed(1)),
+                sod: Math.round(food.sod * r),
+                pot: Math.round(food.pot * r)
+            });
+
+            saveState();
+            closeModal('meal-modal');
+            renderAll();
+            showToast(`تمت إضافة "${food.name}" إلى ${type} 🥗`, 'coral');
+        }
+
+        function removeMeal(id) {
+            state.meals = state.meals.filter(m => m.id !== id);
+            saveState();
+            renderAll();
+            showToast('تم حذف الوجبة من السجل', 'info');
+        }
+
+        function handleAddCustomFood(e) {
+            e.preventDefault();
+            const newFood = {
+                id: 'cf_' + Date.now(),
+                name: document.getElementById('cf-name').value.trim(),
+                cal: parseFloat(document.getElementById('cf-cal').value) || 0,
+                pro: parseFloat(document.getElementById('cf-pro').value) || 0,
+                carb: parseFloat(document.getElementById('cf-carb').value) || 0,
+                fat: parseFloat(document.getElementById('cf-fat').value) || 0,
+                sod: parseFloat(document.getElementById('cf-sod').value) || 0,
+                pot: parseFloat(document.getElementById('cf-pot').value) || 0
+            };
+
+            state.foods.unshift(newFood);
+            saveState();
+            populateFoodsSelect();
+            closeModal('custom-food-modal');
+            showToast(`تم حفظ "${newFood.name}" في قاعدة الأطعمة ✨`, 'mint');
+        }
+
+        // ==================== متتبع العادات الأسبوعي ====================
+        function renderHabitsTable() {
+            const tbody = document.getElementById('habits-table-body');
+            if (state.habits.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400 font-bold">لا توجد عادات مضافة حالياً.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = state.habits.map(h => {
+                const completedDays = h.week.filter(Boolean).length;
+                const pct = Math.round((completedDays / 7) * 100);
+
+                const daysBtns = h.week.map((isDone, idx) => `
+                    <td class="py-3.5 px-2 text-center">
+                        <button onclick="toggleHabit('${h.id}', ${idx})" class="w-8 h-8 rounded-2xl mx-auto flex items-center justify-center transition-all ${isDone ? 'bg-mint-500 text-white shadow-sm shadow-mint-500/30 check-pop' : 'bg-slate-100 hover:bg-slate-200 text-transparent'}">
+                            <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                        </button>
+                    </td>
+                `).join('');
+
+                return `
+                    <tr class="hover:bg-softSand/50 transition-colors">
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-xl">${h.emoji || '🌟'}</span>
+                                <div>
+                                    <span class="font-extrabold text-slate-900 block">${escapeHTML(h.title)}</span>
+                                    <span class="text-[11px] font-bold text-lavender-600 bg-lavender-50 px-2 py-0.5 rounded-full">${h.category}</span>
+                                </div>
+                            </div>
+                        </td>
+                        ${daysBtns}
+                        <td class="py-3.5 px-3 text-center">
+                            <span class="text-xs font-black text-coral-600 bg-coral-50 px-2.5 py-1 rounded-full">${pct}%</span>
+                        </td>
+                        <td class="py-3.5 px-3 text-center">
+                            <button onclick="deleteHabit('${h.id}')" class="p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function handleAddHabit(e) {
+            e.preventDefault();
+            const title = document.getElementById('habit-title-input').value.trim();
+            const category = document.getElementById('habit-cat-input').value;
+            const emoji = document.getElementById('habit-emoji-input').value;
+            if (!title) return;
+
+            state.habits.push({
+                id: 'h_' + Date.now(),
+                emoji,
+                title,
+                category,
+                streak: 0,
+                week: [false, false, false, false, false, false, false]
+            });
+
+            document.getElementById('habit-title-input').value = '';
+            saveState();
+            closeModal('habit-modal');
+            renderAll();
+            showToast('تمت إضافة العادة الجديدة بنجاح 🎉', 'mint');
+        }
+
+        function toggleHabit(id, dayIdx) {
+            const habit = state.habits.find(h => h.id === id);
+            if (!habit) return;
+            habit.week[dayIdx] = !habit.week[dayIdx];
+            habit.streak = habit.week.filter(Boolean).length;
+            saveState();
+            renderAll();
+            if (habit.week[dayIdx] && dayIdx === 6) {
+                showToast(`رائع! أتممت "${habit.title}" اليوم 🌟`, 'mint');
+            }
+        }
+
+        function deleteHabit(id) {
+            state.habits = state.habits.filter(h => h.id !== id);
+            saveState();
+            renderAll();
+            showToast('تم حذف العادة', 'info');
+        }
+
+        // ==================== النوافذ المنبثقة والأهداف ====================
+        function openMealModal() {
+            populateFoodsSelect();
+            document.getElementById('meal-grams-input').value = 100;
+            updateLiveMacroPreview();
+            showModal('meal-modal');
+        }
+
+        function openCustomFoodModal() {
+            showModal('custom-food-modal');
+        }
+
+        function openHabitModal() {
+            showModal('habit-modal');
+        }
+
+        function openGoalsModal() {
+            const g = state.goals;
+            document.getElementById('g-cal').value = g.calories;
+            document.getElementById('g-pro').value = g.protein;
+            document.getElementById('g-sod').value = g.sodium;
+            document.getElementById('g-pot').value = g.potassium;
+            document.getElementById('g-water').value = g.water;
+            showModal('goals-modal');
+        }
+
+        function showModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+
+        function handleSaveGoals(e) {
+            e.preventDefault();
+            state.goals = {
+                calories: parseInt(document.getElementById('g-cal').value) || 2200,
+                protein: parseInt(document.getElementById('g-pro').value) || 150,
+                sodium: parseInt(document.getElementById('g-sod').value) || 2000,
+                potassium: parseInt(document.getElementById('g-pot').value) || 3500,
+                water: parseInt(document.getElementById('g-water').value) || 3000
+            };
+            saveState();
+            closeModal('goals-modal');
+            renderAll();
+            showToast('تم تحديث أهدافك اليومية 🎯', 'coral');
+        }
+
+        // ==================== الرسوم البيانية المبهجة (Chart.js) ====================
+        function renderAnalyticsCharts() {
+            const totals = getTotals();
+            const labels = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'اليوم'];
+            
+            const calSeries = [2050, 2180, 1950, 2240, 2100, 1980, Math.round(totals.cal)];
+            const sodSeries = [1800, 2050, 1650, 1900, 1720, 1580, Math.round(totals.sod)];
+            const potSeries = [3100, 2950, 3400, 3250, 3600, 3550, Math.round(totals.pot)];
+
+            const ctx1 = document.getElementById('caloriesChart').getContext('2d');
+            if (calChart) calChart.destroy();
+            calChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'السعرات الحرارية (kcal)',
+                        data: calSeries,
+                        borderColor: '#FF6B4A',
+                        backgroundColor: 'rgba(255, 107, 74, 0.14)',
+                        borderWidth: 3.5,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#FF6B4A',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#334155', font: { family: 'Tajawal', weight: 'bold' } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748B' }, grid: { display: false } },
+                        y: { ticks: { color: '#64748B' }, grid: { color: '#F1F5F9' } }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('electrolytesChart').getContext('2d');
+            if (elecChart) elecChart.destroy();
+            elecChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'الصوديوم (mg)',
+                            data: sodSeries,
+                            backgroundColor: '#F59E0B',
+                            borderRadius: 8
+                        },
+                        {
+                            label: 'البوتاسيوم (mg)',
+                            data: potSeries,
+                            backgroundColor: '#10B981',
+                            borderRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#334155', font: { family: 'Tajawal', weight: 'bold' } } } },
+                    scales: {
+                        x: { ticks: { color: '#64748B' }, grid: { display: false } },
+                        y: { ticks: { color: '#64748B' }, grid: { color: '#F1F5F9' } }
+                    }
+                }
+            });
+        }
+
+        function exportBackup() {
+            const url = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(state, null, 2));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tawazun-pro-backup.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast('تم تحميل النسخة الاحتياطية بنجاح 📦', 'mint');
+        }
+
+        function resetDemoState() {
+            state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            saveState();
+            populateFoodsSelect();
+            renderAll();
+            if (!document.getElementById('tab-analytics').classList.contains('hidden')) {
+                renderAnalyticsCharts();
+            }
+            showToast('تمت استعادة البيانات التجريبية ✨', 'info');
+        }
+
+        function escapeHTML(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function showToast(msg, theme = 'mint') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const styles = {
+                mint: 'bg-white border-mint-200 text-mint-700',
+                coral: 'bg-white border-coral-200 text-coral-600',
+                info: 'bg-white border-skyJoy-200 text-skyJoy-700'
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-lg text-xs sm:text-sm font-extrabold animate-pop ${styles[theme] || styles.mint}`;
+            toast.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 shrink-0"></i><span>${escapeHTML(msg)}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
